@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Sketchpad : A simple sketchpad library.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!--<script src="scripts/sketchpad.js"></script>-->
+    <script src="dist/sketchpad.js"></script>
+
+    <style>
+      .sketchpad {
+        background: #FFF;
+        width: 400px;
+        height: 400px;
+        border-radius: 2px;
+
+        -webkit-box-shadow: 2px 2px 5px 0px rgba(50, 50, 50, 0.75);
+        -moz-box-shadow: 2px 2px 5px 0px rgba(50, 50, 50, 0.75);
+        box-shadow: 2px 2px 5px 0px rgba(50, 50, 50, 0.75);
+      }
+
+      .size {
+        background: #f1f1f1;
+        padding: 3px;
+        display: inline-block;
+      }
+
+      .color {
+        background:rgba(50, 50, 50, 0.75);
+        padding: 3px;
+        display: inline-block;
+      }
+
+    </style>
+
+    <title>Sketchpad</title>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+      <header class="inner">
+        <a id="forkme_banner" href="https://github.com/yiom/sketchpad">View on GitHub</a>
+
+        <h1 id="project_title">Sketchpad</h1>
+        <h2 id="project_tagline">A simple sketchpad library.</h2>
+        <iframe src="https://ghbtns.com/github-btn.html?user=yiom&repo=sketchpad&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=yiom&repo=sketchpad&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
+
+        <section id="downloads">
+          <a class="zip_download_link" href="https://github.com/yiom/sketchpad/zipball/master">
+            Download this project as a .zip file
+          </a>
+          <a class="tar_download_link" href="https://github.com/yiom/sketchpad/tarball/master">
+            Download this project as a tar.gz file
+          </a>
+        </section>
+      </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>
+          Installing
+        </h3>
+        <p>
+          To install it via bower, simply run:
+        </p>
+        <pre><code>$ bower install sketchpad</code></pre>
+        <h3>
+          Getting Stated
+        </h3>
+        <p>
+          You just need a canvas
+        </p>
+        <pre><code>&ltcanvas class="sketchpad" id="sketchpad"&gt&ltcanvas&gt</code></pre>
+        <p>
+          And you should be able to instantiate a sketchpad by coding:
+        </p>
+<pre><code>var sketchpad = new Sketchpad({
+  element: '#sketchpad',
+  width: 400,
+  height: 400
+});</code></pre>
+        <p>
+          The code above would reproduce:
+        </p>
+        <div style="text-align: center">
+          <canvas class="sketchpad" id="sketchpad"><canvas>
+        </div>
+        <p>
+          Our API also provides some useful functionalities:
+        </p>
+        <div style="text-align: center">
+          <button onclick="undo()">undo</button>
+          <button onclick="redo()">redo</button>
+          <button onclick="converteJson()">json</button>
+          <button onclick="toImage()">IMAGEM</button>
+
+          <div class="color">
+          <button onclick="color('#a92d2d')">a92d2d</button>
+          <button onclick="color('#aee81f')">aee81f</button>
+          <button onclick="color('#51238e')">51238e</button>
+          <button onclick="color('#ada6b5')">ada6b5</button>
+          <button onclick="color('#000000')">000000</button>
+          </div>
+
+          <div class="size">
+            <button onclick="size(2)">2px</button>
+            <button onclick="size(5)">5px</button>
+            <button onclick="size(7)">7px</button>
+          </div>
+          <!--<button onclick="animateSketchpad()">animate</button>-->
+        </div>
+        <p>Undo</p>
+        <pre><code>sketchpad.undo()</code></pre>
+        <p>Redo</p>
+        <pre><code>sketchpad.redo()</code></pre>
+        <p>Change stroke color</p>
+        <pre><code>sketchpad.color = '#FFF'</code></pre>
+        <p>Change stroke size</p>
+        <pre><code>sketchpad.penSize = 10</code></pre>
+        <p>Playback each sketchpad stroke (10ms delay between each line piece)</p>
+        <pre><code>sketchpad.animate(10)</code></pre>
+        <p>Recover sketchpad JSON or Object Settings</p>
+<pre><code>sketchpad.toJSON()
+sketchpad.toObject()</code></pre>
+        <p>
+          By recovering the sketchpad JSON or Object you can then clone the
+          sketchpad by coding:
+        </p>
+<pre><code>var settings = sketchpad.toObject()
+settings.element = '#other-sketchpad'
+var otherSketchpad = new Sketchpad(settings)</code></pre>
+        <div style="text-align: center; margin: 12px 0 12px">
+          <button id="recover-button" onclick="recover()">recover</button>
+        </div>
+        <div style="text-align: center">
+          <canvas class="sketchpad" id="other-sketchpad"><canvas>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Sketchpad maintained by <a href="https://github.com/yiom">yiom</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+
+    <script>
+      var sketchpad;
+      $(document).ready(function() {
+        sketchpad = new Sketchpad({
+          element: '#sketchpad',
+          width: 400,
+          height: 400
+        });
+      });
+      function undo() {
+        sketchpad.undo();
+      }
+      function redo() {
+        sketchpad.redo();
+      }
+      function color(hex) {
+        sketchpad.color = hex;
+      }
+
+      function toImage() {
+        var image = document.querySelector('body');
+
+        image.append(sketchpad.toImage());
+      }
+
+      function converteJson(event) {
+        console.log(1, sketchpad.toJSON());
+      }
+
+      function size(pen) {
+        sketchpad.penSize = pen;
+      }
+
+      function animateSketchpad() {
+        sketchpad.animate(10);
+      }
+
+      function recover(event) {
+        var settings = sketchpad.toObject();
+        settings.element = '#other-sketchpad';
+        var otherSketchpad = new Sketchpad(settings);
+        $('#recover-button').hide();
+      }
+    </script>
+  </body>
+</html>
+
+
+

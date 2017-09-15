@@ -109,7 +109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Setup Internal Events
 	    this.events = {};
 	    this.events['mousemove'] = [];
-	    this.internalEvents = ['MouseDown', 'MouseUp', 'MouseOut'];
+	    this.internalEvents = ['MouseDown', 'MouseUp', 'MouseOut', 'DrawEnd'];
 	    this.internalEvents.forEach(function (name) {
 	      var lower = name.toLowerCase();
 	      _this.events[lower] = [];
@@ -137,8 +137,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Sketchpad, [{
 	    key: '_position',
 	    value: function _position(event) {
-	      var x = event.pageX - this.canvas.offsetLeft;
-	      var y = event.pageY - this.canvas.offsetTop;
+	      var x = event.offsetX;
+	      var y = event.offsetY;
 
 	      return [x, y];
 	    }
@@ -241,9 +241,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'onMouseUp',
 	    value: function onMouseUp(event) {
-	      if (this._sketching) {
+	      if (this._sketching && this._currentStroke.lines.length) {
 	        this.strokes.push(this._currentStroke);
 	        this._sketching = false;
+	        this.dispatch('drawend', {});
 	      }
 
 	      this.canvas.removeEventListener('mousemove', this.onMouseMove);
@@ -264,6 +265,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.trigger('mousemove', [event]);
 	    }
+	  }, {
+	    key: 'onDrawEnd',
+	    value: function onDrawEnd() {}
 
 	    /*
 	     * Public API
@@ -313,6 +317,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.strokes.push(stroke);
 	        this._stroke(stroke);
 	      }
+	      this.dispatch('drawend', {});
 	    }
 	  }, {
 	    key: 'undo',
@@ -324,6 +329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (stroke) {
 	        this.undoHistory.push(stroke);
 	      }
+	      this.dispatch('drawend', {});
 	    }
 	  }, {
 	    key: 'toImage',
@@ -341,6 +347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        type: 'clear'
 	      });
 	      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	      this.dispatch('drawend', {});
 	    }
 	  }, {
 	    key: 'redraw',
@@ -350,6 +357,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.strokes.forEach(function (stroke) {
 	        _this5._stroke(stroke);
 	      }, this);
+	      this.dispatch('drawend', {});
 	    }
 	  }, {
 	    key: 'reset',
@@ -488,6 +496,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.events[action].forEach(function (callback) {
 	        callback.apply(undefined, _toConsumableArray(args));
 	      });
+	    }
+
+	    /**
+	     * Invokes a named trigger event.
+	     * 
+	     * param: <string> name The name of the event to invoke.
+	     * param: <object> parameters Parameters to pass to the event.
+	    */
+
+	  }, {
+	    key: 'dispatch',
+	    value: function dispatch(action, parameters) {
+	      var callbacks = this.events[action];
+
+	      if (!callbacks) {
+	        throw new Error();
+	      }
+
+	      for (var index = 0; index < callbacks.length; index++) {
+	        callbacks[index].apply(this, [this, parameters]);
+	      }
 	    }
 	  }]);
 

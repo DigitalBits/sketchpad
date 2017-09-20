@@ -80,10 +80,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    this.canvas = options.canvas;
-
 	    // Try to extract 'width', 'height', 'color', 'penSize' and 'readOnly'
 	    // from the options or the DOM element.
-	    ['width', 'height', 'color', 'penSize', 'readOnly'].forEach(function (attr) {
+	    ['width', 'height', 'color', 'penSize', 'readOnly', 'disable'].forEach(function (attr) {
 	      _this[attr] = options[attr] || _this.canvas.getAttribute('data-' + attr);
 	    }, this);
 
@@ -95,6 +94,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.penSize = this.penSize || 5;
 
 	    this.readOnly = this.readOnly || false;
+	    this.disable = this.disable || false;
 
 	    // Sketchpad History settings
 	    this.strokes = options.strokes ? this._strokesFormat(options.strokes) : [];
@@ -104,10 +104,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Enforce context for Moving Callbacks
 	    this.onMouseMove = this.onMouseMove.bind(this);
 
-	    this.canvas.style.cursor = 'crosshair';
+	    if (!this.disable) {
+	      this.canvas.style.cursor = 'crosshair';
+	    }
 
 	    // Setup Internal Events
 	    this.events = {};
+
 	    this.events['mousemove'] = [];
 	    this.internalEvents = ['MouseDown', 'MouseUp', 'MouseOut', 'DrawEnd'];
 	    this.internalEvents.forEach(function (name) {
@@ -118,6 +121,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _this['on' + name] = _this['on' + name].bind(_this);
 
 	      // Add DOM Event Listeners
+	      if (_this.disable) {
+	        return;
+	      }
+
 	      _this.canvas.addEventListener(lower, function () {
 	        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	          args[_key] = arguments[_key];
@@ -139,7 +146,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function _position(event) {
 	      var x = event.offsetX;
 	      var y = event.offsetY;
-
 	      return [x, y];
 	    }
 	  }, {
@@ -228,6 +234,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 
 	  }, {
+	    key: 'onDrawEnd',
+	    value: function onDrawEnd(event) {}
+	  }, {
 	    key: 'onMouseDown',
 	    value: function onMouseDown(event) {
 	      this._sketching = true;
@@ -268,9 +277,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      this.trigger('mousemove', [event]);
 	    }
-	  }, {
-	    key: 'onDrawEnd',
-	    value: function onDrawEnd() {}
 
 	    /*
 	     * Public API
@@ -316,10 +322,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'redo',
 	    value: function redo() {
 	      var stroke = this.undoHistory.pop();
+
 	      if (stroke) {
 	        this.strokes.push(stroke);
 	        this._stroke(stroke);
 	      }
+
 	      this.dispatch('drawend', {});
 	    }
 	  }, {
@@ -327,12 +335,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function undo() {
 	      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	      var stroke = this.strokes.pop();
+
 	      this.redraw();
 
 	      if (stroke) {
 	        this.undoHistory.push(stroke);
 	      }
-	      this.dispatch('drawend', {});
 	    }
 	  }, {
 	    key: 'toImage',
@@ -360,6 +368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.strokes.forEach(function (stroke) {
 	        _this5._stroke(stroke);
 	      }, this);
+
 	      this.dispatch('drawend', {});
 	    }
 	  }, {
@@ -512,6 +521,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'dispatch',
 	    value: function dispatch(action, parameters) {
 	      var callbacks = this.events[action];
+
+	      if (this.disable) {
+	        return;
+	      }
 
 	      if (!callbacks) {
 	        throw new Error();

@@ -213,7 +213,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this3 = this;
 
 	      var strokes = data.map(function (stroke) {
-	        stroke.lines = _this3._lineToArray(stroke.lines);
+	        if (typeof stroke.lines === 'string') {
+	          stroke.lines = _this3._lineToArray(stroke.lines);
+	        }
+
 	        return stroke;
 	      });
 
